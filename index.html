@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en-IE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12355b">
+<title>Spotter Sheet – Demo (sample data)</title>
+<style>
+:root{
+  --ink:#111827; --muted:#4b5563; --line:#d1d5db; --bg:#f3f5f8; --card:#ffffff;
+  --navy:#12355b; --teal:#0e7c7b;
+  --ok:#166534; --ok-bg:#dcfce7;
+  --warn:#92400e; --warn-bg:#fef3c7;
+  --bad:#991b1b; --bad-bg:#fee2e2;
+  --info:#1e3a8a; --info-bg:#dbeafe;
+  --nav-h:64px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font:17px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  padding-bottom:calc(var(--nav-h) + 28px + env(safe-area-inset-bottom));
+  touch-action:manipulation;
+}
+body.lock{overflow:hidden}
+button,select,summary{font:inherit; touch-action:manipulation}
+[hidden]{display:none!important}
+
+/* ---------- header (always visible) ---------- */
+.top{position:sticky; top:0; z-index:30}
+.brand{background:var(--navy); color:#fff; display:flex; justify-content:space-between; align-items:center; gap:8px; padding:9px 14px}
+.brand h1{margin:0; font-size:1.05rem; font-weight:700}
+.brand .tag{font-size:.75rem; background:#fff; color:var(--navy); padding:2px 8px; border-radius:99px; font-weight:700; white-space:nowrap}
+.sample{background:var(--warn-bg); color:var(--warn); font-size:.85rem; font-weight:600; padding:5px 14px; border-bottom:2px solid #f59e0b}
+
+main{max-width:760px; margin:0 auto; padding:14px}
+h2{margin:4px 0 6px; font-size:1.35rem}
+h3.sec{margin:0 0 8px; font-size:1.05rem}
+.sub{color:var(--muted); margin:0 0 12px; font-size:.95rem}
+.small{font-size:.85rem; color:var(--muted)}
+.meta{color:var(--muted); font-size:.9rem}
+
+/* ---------- cards ---------- */
+.card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; margin:0 0 12px}
+.card.info{background:var(--info-bg); border-color:#93c5fd; color:var(--info)}
+.card.next{border-left:6px solid var(--teal)}
+.card.ready{background:var(--ok-bg); border-color:#86efac}
+.card.alert{border-left:6px solid #dc2626}
+.rowbtn{
+  display:block; width:100%; text-align:left; background:var(--card); color:inherit;
+  border:1px solid var(--line); border-radius:14px; padding:12px 14px; margin:0 0 10px;
+  min-height:64px; cursor:pointer; text-decoration:none;
+}
+.rowbtn:active{background:#eef2f7}
+.rowtop{display:flex; justify-content:space-between; align-items:flex-start; gap:10px}
+.rowtop>*{min-width:0}
+.rowtop>.chip{flex:none}
+.name{font-weight:700; font-size:1.1rem}
+.line{font-size:.92rem; margin-top:4px}
+.line.bad{color:var(--bad)} .line.warn{color:var(--warn)} .line.ok{color:var(--ok)}
+.okline{color:var(--ok); font-weight:700; margin:6px 0}
+
+/* ---------- chips ---------- */
+.chip{display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:99px; font-weight:700; font-size:.82rem; max-width:100%; white-space:nowrap}
+.chip.wrap{white-space:normal; overflow-wrap:anywhere}
+.chip.ok{background:var(--ok-bg); color:var(--ok)}
+.chip.warn{background:var(--warn-bg); color:var(--warn)}
+.chip.bad{background:var(--bad-bg); color:var(--bad)}
+.chip.info{background:var(--info-bg); color:var(--info)}
+.chip.none{background:#e5e7eb; color:#374151}
+.chip.lv1{background:#e0f2fe; color:#075985}
+.chip.lv2{background:#cffafe; color:#155e75}
+.chip.lv3{background:#dbeafe; color:#1e40af}
+.chip.lv4{background:#e0e7ff; color:#3730a3}
+.chip.lv5{background:#ede9fe; color:#5b21b6}
+.chip.lv6{background:#fae8ff; color:#86198f}
+.chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; align-items:center}
+
+.bar{height:12px; background:#e5e7eb; border-radius:99px; overflow:hidden; margin:6px 0}
+.bar span{display:block; height:100%; background:var(--teal)}
+
+/* ---------- buttons (big, no typing) ---------- */
+.act{
+  display:block; width:100%; min-height:56px; margin:8px 0 0; padding:10px 14px;
+  background:var(--teal); color:#fff; border:0; border-radius:14px; font-weight:700; cursor:pointer; text-align:center
+}
+.act:active{filter:brightness(.9)}
+.act.alt{background:#fff; color:var(--navy); border:2px solid var(--navy)}
+.act.danger{background:#fff; color:var(--bad); border:2px solid var(--bad)}
+.act[disabled]{background:#e5e7eb; color:#6b7280; border:0; cursor:not-allowed}
+.pair{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.pair .act{margin-top:8px}
+.btnrow{display:grid; grid-template-columns:repeat(3,1fr); gap:8px}
+.btnrow .act{margin:0; min-height:56px}
+.back,.closebtn{
+  white-space:nowrap;
+  display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:0 16px;
+  background:#fff; border:2px solid var(--line); border-radius:12px; color:var(--navy); font-weight:700; cursor:pointer
+}
+.filters{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:0 0 10px}
+.fbtn{min-height:52px; border:2px solid var(--line); background:#fff; border-radius:12px; font-weight:700; color:#374151; cursor:pointer; padding:4px 8px}
+.fbtn[aria-pressed="true"]{border-color:var(--navy); background:#eaf0f8; color:var(--navy)}
+
+select{min-height:52px; padding:0 10px; border:2px solid var(--line); border-radius:12px; background:#fff; width:100%; margin-top:4px}
+label{display:block; font-weight:700; margin:10px 0 2px}
+
+/* ---------- skills ---------- */
+.skill{padding:10px 0; border-bottom:1px solid #eef0f3}
+.skill:last-child{border-bottom:0}
+.skrow{display:flex; justify-content:space-between; align-items:center; gap:10px}
+.skname{font-weight:700}
+.seg{display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:6px}
+.segbtn{min-height:48px; border:2px solid var(--line); background:#fff; border-radius:12px; font-weight:700; color:#374151; cursor:pointer; padding:0 4px}
+.segbtn[aria-pressed="true"].s-none{background:#e5e7eb; border-color:#9ca3af}
+.segbtn[aria-pressed="true"].s-learning{background:var(--info-bg); border-color:#2563eb; color:var(--info)}
+.segbtn[aria-pressed="true"].s-done{background:var(--ok-bg); border-color:#16a34a; color:var(--ok)}
+details.ahead{margin-top:12px; border-top:1px dashed var(--line); padding-top:6px}
+details.ahead summary{min-height:48px; display:flex; align-items:center; font-weight:700; color:var(--navy); cursor:pointer}
+
+.cert{padding:12px 0; border-bottom:1px solid #eef0f3}
+.cert:last-child{border-bottom:0}
+.crow{display:flex; justify-content:space-between; align-items:flex-start; gap:10px}
+.crow b{display:block}
+.tl{list-style:none; margin:0; padding:0}
+.tl li{padding:8px 0; border-bottom:1px solid #eef0f3; display:flex; justify-content:space-between; gap:10px}
+.tl li:last-child{border-bottom:0}
+.tl .meta{white-space:nowrap}
+ol.steps{margin:6px 0 0; padding-left:22px}
+ol.steps li{margin:3px 0}
+ol.steps li:first-child{font-weight:700}
+.mate{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #eef0f3}
+.mate:last-child{border-bottom:0}
+
+/* ---------- bottom nav ---------- */
+nav{
+  position:fixed; left:0; right:0; bottom:0; z-index:40; background:#fff; border-top:2px solid var(--line);
+  display:grid; grid-template-columns:repeat(4,1fr); padding-bottom:env(safe-area-inset-bottom)
+}
+nav a{
+  display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:var(--nav-h);
+  color:var(--muted); font-weight:700; text-decoration:none; font-size:.95rem; line-height:1.15; text-align:center
+}
+nav a small{font-weight:400; font-size:.7rem}
+nav a[aria-current="page"]{color:var(--navy); box-shadow:inset 0 4px 0 var(--navy); background:#f1f5fb}
+
+/* ---------- pop-out sheet ---------- */
+#overlay{position:fixed; inset:0; background:rgba(17,24,39,.55); z-index:50}
+#sheet{
+  position:fixed; left:0; right:0; bottom:0; z-index:55; max-width:760px; margin:0 auto;
+  height:92vh; height:92dvh; background:var(--bg); border-radius:18px 18px 0 0;
+  display:flex; flex-direction:column; box-shadow:0 -8px 30px rgba(0,0,0,.3); animation:up .2s ease-out
+}
+@keyframes up{from{transform:translateY(40px); opacity:.4} to{transform:none; opacity:1}}
+@media (prefers-reduced-motion:reduce){#sheet{animation:none}}
+.sheet-h{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; padding:12px 14px; background:#fff; border-bottom:1px solid var(--line); border-radius:18px 18px 0 0}
+.sheet-h h2{margin:0}
+#sheetBody{overflow-y:auto; padding:14px 14px calc(110px + env(safe-area-inset-bottom)); flex:1; -webkit-overflow-scrolling:touch}
+
+/* ---------- toast ---------- */
+#toast{
+  position:fixed; left:12px; right:12px; bottom:calc(var(--nav-h) + 12px + env(safe-area-inset-bottom)); z-index:60;
+  background:#111827; color:#fff; border-radius:14px; padding:10px 12px; display:flex; gap:10px; align-items:center; justify-content:space-between;
+  max-width:736px; margin:0 auto
+}
+body.lock #toast{bottom:calc(12px + env(safe-area-inset-bottom))}
+#toast button{background:#fbbf24; color:#111; border:0; border-radius:10px; min-height:48px; padding:0 18px; font-weight:700; cursor:pointer}
+button:focus-visible,a:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #2563eb; outline-offset:2px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand"><h1>Spotter Sheet</h1><span class="tag">DEMO · fictional concept</span></div>
+  <div class="sample" role="note" id="sampleBar">SAMPLE DATA: invented people, no real club or children.</div>
+</header>
+
+<main id="app"></main>
+
+<div id="toast" hidden role="status"><span id="toastMsg"></span><button id="toastUndo" type="button">Undo</button></div>
+
+<nav id="nav" aria-label="Choose a view">
+  <a href="#member" data-tab="member">Member<small>my status</small></a>
+  <a href="#attendee" data-tab="attendee">Attendee<small>my group</small></a>
+  <a href="#admin" data-tab="admin">Admin<small>everyone</small></a>
+  <a href="#tools" data-tab="tools">Demo<small>tools</small></a>
+</nav>
+
+<div id="overlay" hidden></div>
+<section id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+  <div class="sheet-h">
+    <div><h2 id="sheetTitle"></h2><div id="sheetSub"></div></div>
+    <button type="button" class="closebtn" id="sheetClose">Close ✕</button>
+  </div>
+  <div id="sheetBody"></div>
+</section>
+
+<script>
+(function(){
+'use strict';
+
+/* =====================================================================
+   SAMPLE CLUB RULES – invented for this demo. NOT Gymnastics Ireland's.
+   ===================================================================== */
+var KEY = 'spotter-sheet-demo-v2';
+var WARN_DAYS = 60;
+
+var LEVELS = [
+  {n:1, short:'Starter',               skills:['Forward roll','Straight jump','Balance on a low beam','Hang from a bar']},
+  {n:2, short:'Foundation',            skills:['Cartwheel','Backward roll','Bridge','Straddle jump']},
+  {n:3, short:'Intermediate',          skills:['Round-off','Handstand hold','Back walkover','Glide swing on bars']},
+  {n:4, short:'Advanced',              skills:['Back handspring','Handstand forward roll','Kip on bars','Cartwheel on beam']},
+  {n:5, short:'Competitive (local)',   skills:['Back tuck','Round-off back handspring','Handspring vault','Free hip circle']},
+  {n:6, short:'Competitive (national+)',skills:['Layout with full twist','Beam series with a somersault','Yurchenko-style vault','Bar release move']}
+];
+// Generic tier names (not official award titles). 0 years = no expiry.
+var CERTS = [
+  {id:'sg',  name:'Safeguarding training',      years:3, minAge:14, prereq:null},
+  {id:'vet', name:'Vetting status (date only)', years:3, minAge:14, prereq:null},
+  {id:'fa',  name:'First aid',                  years:2, minAge:14, prereq:null},
+  {id:'t1',  name:'Assistant coach tier',       years:0, minAge:14, prereq:null,  tier:1},
+  {id:'t2',  name:'Club coach tier',            years:0, minAge:16, prereq:'t1',  tier:2},
+  {id:'t3',  name:'Advanced coach tier',        years:0, minAge:18, prereq:'t2',  tier:3}
+];
+var CERT = {}; CERTS.forEach(function(c){ CERT[c.id]=c; });
+var GROUPS = [
+  {id:'tots', name:'Tots',              minL:1, maxL:1, minA:4,  maxA:6,  assist:1},
+  {id:'beg',  name:'Rec Beginners',     minL:1, maxL:2, minA:6,  maxA:9,  assist:1},
+  {id:'int',  name:'Rec Intermediate',  minL:2, maxL:3, minA:8,  maxA:12, assist:2},
+  {id:'dev',  name:'Development Squad', minL:3, maxL:4, minA:9,  maxA:15, assist:2},
+  {id:'comp', name:'Competitive Squad', minL:5, maxL:6, minA:11, maxA:18, assist:3}
+];
+function G(id){ for(var i=0;i<GROUPS.length;i++){ if(GROUPS[i].id===id) return GROUPS[i]; } return null; }
+
+/* =====================================================================
+   DATE HELPERS (UTC midnight, so no time-zone surprises)
+   ===================================================================== */
+function realToday(){ var d=new Date(); return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); }
+function addDays(d,n){ var x=new Date(d.getTime()); x.setUTCDate(x.getUTCDate()+n); return x; }
+function addYears(d,n){ var x=new Date(d.getTime()); x.setUTCFullYear(x.getUTCFullYear()+n); return x; }
+function iso(d){ return d.toISOString().slice(0,10); }
+function parse(s){ var p=s.split('-').map(Number); return new Date(Date.UTC(p[0], p[1]-1, p[2])); }
+function diffDays(a,b){ return Math.round((a.getTime()-b.getTime())/86400000); }
+function fmt(d){ return d.toLocaleDateString('en-IE',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}); }
+function monthIndex(d){ return d.getUTCFullYear()*12 + d.getUTCMonth(); }
+function esc(s){ return String(s).replace(/[&<>"']/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function plural(n,w){ return n+' '+w+(n===1?'':'s'); }
+
+/* =====================================================================
+   SAMPLE DATA: the 12 invented people
+   Names = most popular newborn names in Ireland in 2025 (CSO): top 6 girls and top 6 boys.
+   ===================================================================== */
+var data = null;
+
+function seed(){
+  var T = realToday();
+  function P(id,name,age,extraMonths,level,group,skills,certs,assists){
+    var bTotal = monthIndex(T) - (age*12 + extraMonths + 1);
+    var by = Math.floor(bTotal/12), bm = (bTotal%12)+1;
+    var completed = {};
+    for(var k=1;k<level;k++){ completed[k] = iso(addDays(T, -((level-k)*150+30))); }
+    return {id:id, name:name, birth:by+'-'+(bm<10?'0':'')+bm, level:level, completed:completed,
+            skills:skills||{}, certs:certs||{}, group:group, assists:assists||null};
+  }
+  function valid(daysUntilExpiry, years){ return {status:'done', date: iso(addYears(addDays(T,daysUntilExpiry), -years))}; }
+  function got(daysAgo){ return {status:'done', date: iso(addDays(T,-daysAgo))}; }
+  var LRN = function(){ return {status:'learning', date:null}; };
+  var D='done', L='learning';
+  return {
+    v:2,
+    people:[
+      P('p1','Sadie', 4, 3,1,'tots',{L1S1:L}),
+      P('p2','Fionn', 5, 8,1,'tots',{L1S1:D,L1S2:D,L1S3:L}),
+      P('p3','Lily',  6, 5,2,'beg', {L2S1:D,L2S2:L}),
+      P('p4','Noah',  7, 2,1,'beg', {L1S1:D,L1S2:D,L1S3:D,L1S4:D}),
+      P('p5','Éabha', 8, 6,2,'int', {L2S1:D,L2S2:D,L2S3:D,L2S4:L,L3S1:L}),
+      P('p6','Emily',10, 1,3,'int', {L3S1:D,L3S2:D,L3S3:L}),
+      P('p7','James',11, 9,3,'dev', {L3S1:D,L3S2:D,L3S3:D,L3S4:L}),
+      P('p8','Oisín',12, 4,4,'int', {L4S1:D,L4S2:D,L4S3:D,L4S4:L}),
+      P('p9','Jack', 14, 2,4,'dev', {L4S1:D,L4S2:L}, {sg:valid(700,3), t1:LRN()}),
+      P('p10','Fiadh',13,8,5,'comp',{L5S1:D,L5S2:D,L5S3:L}),
+      P('p11','Grace',15,3,6,'comp',{L6S1:D,L6S2:D,L6S3:D,L6S4:L}, {sg:valid(800,3), vet:valid(40,3), t1:got(300), fa:LRN()}, 'tots'),
+      P('p12','Rían', 17,6,5,'comp',{L5S1:D,L5S2:D,L5S3:D,L5S4:D}, {sg:valid(-10,3), vet:valid(500,3), t1:got(900), t2:got(400), fa:valid(100,2)}, 'int')
+    ],
+    requests:[
+      {id:'r1', pid:'p4', kind:'level', target:'level', created:iso(addDays(T,-2)), status:'pending'},
+      {id:'r2', pid:'p9', kind:'cert',  target:'vet',   created:iso(addDays(T,-1)), status:'pending'}
+    ],
+    meMember:'p9', meAttendee:'p8', offset:0, nextReq:3
+  };
+}
+function load(){
+  try{ var raw=localStorage.getItem(KEY); if(raw){ var d=JSON.parse(raw); if(d && d.v===2 && d.people && d.requests){ return d; } } }catch(e){}
+  return seed();
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(data)); }catch(e){} }
+function now(){ return addDays(realToday(), data.offset); }
+function getP(id){ for(var i=0;i<data.people.length;i++){ if(data.people[i].id===id) return data.people[i]; } return null; }
+
+/* =====================================================================
+   RULES (these run by themselves from dates and records)
+   ===================================================================== */
+function ageYears(p,n){
+  var b=p.birth.split('-').map(Number), bTotal=b[0]*12+(b[1]-1);
+  return Math.max(0, Math.floor((monthIndex(n)-bTotal-1)/12));   // counted once the birth month has passed
+}
+function monthsUntilAge(p,n,target){
+  var b=p.birth.split('-').map(Number), bTotal=b[0]*12+(b[1]-1);
+  return Math.max(0, (bTotal + target*12 + 1) - monthIndex(n));
+}
+function levelLabel(n){ return 'Level '+n+' · '+LEVELS[n-1].short; }
+function rangeText(a,b,w){ return a===b ? w+' '+a : w+'s '+a+'–'+b; }
+
+function skillKey(lv,i){ return 'L'+lv+'S'+(i+1); }
+function skillState(p,lv,i){ if(lv<p.level) return 'done'; return p.skills[skillKey(lv,i)]||'none'; }
+function progress(p){ var c=0; for(var i=0;i<4;i++){ if(skillState(p,p.level,i)==='done') c++; } return c; }
+function ready(p){ return !p.completed[p.level] && progress(p)===4; }
+
+function completeLevel(p,n){
+  p.completed[p.level]=iso(n);
+  if(p.level<6) p.level++;
+  resolvePending(p.id,'level','level');
+}
+
+function tierOf(p){ var t=0; [1,2,3].forEach(function(i){ var r=p.certs['t'+i]; if(r && r.status==='done' && t===i-1) t=i; }); return t; }
+
+function certState(p,id,n){
+  var c=CERT[id], r=p.certs[id], age=ageYears(p,n);
+  if(r && r.status==='done'){
+    if(!c.years) return {state:'valid', date:r.date, exp:null, days:null};
+    var exp=addYears(parse(r.date), c.years), days=diffDays(exp,n);
+    return {state:days<0?'expired':(days<=WARN_DAYS?'soon':'valid'), date:r.date, exp:exp, days:days};
+  }
+  if(r && r.status==='learning') return {state:'learning'};
+  if(age<c.minAge){ var mo=monthsUntilAge(p,n,c.minAge); return {state:'blocked', reason:'opens at age '+c.minAge+' (about '+plural(mo,'month')+')'}; }
+  if(c.prereq && !(p.certs[c.prereq] && p.certs[c.prereq].status==='done')) return {state:'blocked', reason:'needs the '+CERT[c.prereq].name+' first'};
+  return {state:'none'};
+}
+function certChip(s){
+  var m={valid:['ok','✓ '+(s.exp?'Valid':'Achieved')], soon:['warn','⚠ Due soon'], expired:['bad','✕ Expired'],
+         learning:['info','… Learning'], none:['none','Not started'], blocked:['none','Not yet']}[s.state];
+  return '<span class="chip '+m[0]+'">'+m[1]+'</span>';
+}
+function certDetail(c,s){
+  if(s.state==='valid') return s.exp ? 'Valid until '+fmt(s.exp) : 'Achieved '+fmt(parse(s.date));
+  if(s.state==='soon') return 'Review due '+fmt(s.exp)+' (in '+plural(s.days,'day')+')';
+  if(s.state==='expired') return 'Expired '+fmt(s.exp)+' ('+plural(Math.abs(s.days),'day')+' ago)';
+  if(s.state==='learning') return 'In progress';
+  if(s.state==='blocked') return cap(s.reason);
+  return 'Not started';
+}
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+/* --- can this person assist a group? (tier + safeguarding + vetting status) --- */
+function assistEval(p,g,n){
+  var blockers=[], warns=[], age=ageYears(p,n);
+  ['sg','vet'].forEach(function(id){
+    var c=CERT[id], s=certState(p,id,n);
+    if(s.state==='expired') blockers.push({key:id, text:c.name+': expired '+fmt(s.exp), first:'Renew '+c.name+' (expired '+plural(Math.abs(s.days),'day')+' ago)'});
+    else if(s.state==='soon') warns.push(c.name+': review due '+fmt(s.exp)+' (in '+plural(s.days,'day')+')');
+    else if(s.state==='learning') blockers.push({key:id, text:c.name+': in progress', first:'Finish '+c.name});
+    else if(s.state==='blocked') blockers.push({key:id, text:c.name+': '+s.reason, first:c.name+' '+s.reason});
+    else if(s.state==='none') blockers.push({key:id, text:c.name+': not recorded', first:'Do '+c.name+' and record it'});
+  });
+  var have=tierOf(p);
+  if(have<g.assist){
+    var nx=CERT['t'+(have+1)], ns=certState(p,nx.id,n), first;
+    if(ns.state==='learning') first='Finish the '+nx.name+' (in progress)';
+    else if(ns.state==='blocked') first=nx.name+' '+ns.reason;
+    else first='Start the '+nx.name;
+    blockers.push({key:'tier', text:'Coach tier: needs '+CERT['t'+g.assist].name+' (has '+(have?CERT['t'+have].name:'none')+')', first:first});
+  }
+  var order = age<14 ? ['tier','sg','vet'] : ['sg','vet','tier'];
+  blockers.sort(function(a,b){ return order.indexOf(a.key)-order.indexOf(b.key); });
+  return {meets:blockers.length===0, blockers:blockers, warns:warns};
+}
+function nextAssist(p,n){
+  for(var i=0;i<GROUPS.length;i++){ var r=assistEval(p,GROUPS[i],n); if(!r.meets) return {group:GROUPS[i], res:r}; }
+  return null;
+}
+function alerts(p,n){
+  var a=[];
+  CERTS.forEach(function(c){
+    if(!c.years) return;
+    var s=certState(p,c.id,n);
+    if(s.state==='expired') a.push({sev:'bad', text:c.name+' expired'});
+    else if(s.state==='soon') a.push({sev:'warn', text:c.name+' due soon'});
+  });
+  if(p.assists){ var g=G(p.assists); if(!assistEval(p,g,n).meets) a.push({sev:'bad', text:'Assisting '+g.name+': requirements not met'}); }
+  return a;
+}
+function learningList(p){
+  var out=[];
+  [p.level, p.level+1].forEach(function(lv){
+    if(lv>6) return;
+    for(var i=0;i<4;i++){ if(p.skills[skillKey(lv,i)]==='learning') out.push('Skill: '+LEVELS[lv-1].skills[i]+' (Level '+lv+')'); }
+  });
+  CERTS.forEach(function(c){ if(p.certs[c.id] && p.certs[c.id].status==='learning') out.push('Certification: '+c.name); });
+  return out;
+}
+function pending(p){ return data.requests.filter(function(r){ return r.pid===p.id && r.status==='pending'; }); }
+function resolvePending(pid,kind,target){
+  data.requests.forEach(function(r){ if(r.pid===pid && r.kind===kind && r.target===target && r.status==='pending'){ r.status='approved'; r.decided=iso(now()); } });
+}
+
+/* --- is a person the right level for a group? --- */
+function fit(p,g,n){
+  var a=ageYears(p,n);
+  return {a:a,
+    level: p.level<g.minL?'below':(p.level>g.maxL?'above':'within'),
+    age:   a<g.minA?'younger':(a>g.maxA?'older':'within')};
+}
+function fitChip(f){
+  if(f.level==='within' && f.age==='within') return '<span class="chip ok">✓ Right level</span>';
+  if(f.level==='above') return '<span class="chip warn">↑ Above range</span>';
+  if(f.level==='below') return '<span class="chip warn">↓ Below range</span>';
+  return '<span class="chip warn">Age outside range</span>';
+}
+
+/* =====================================================================
+   HTML BUILDERS
+   ===================================================================== */
+function levelChip(n){ return '<span class="chip lv'+n+'">L'+n+' · '+esc(LEVELS[n-1].short)+'</span>'; }
+function bar(v,t){ return '<div class="bar" role="img" aria-label="'+v+' of '+t+' skills done"><span style="width:'+Math.round(v/t*100)+'%"></span></div>'; }
+function stateChip(st){
+  return st==='done' ? '<span class="chip ok">✓ Done</span>' : st==='learning' ? '<span class="chip info">… Learning</span>' : '<span class="chip none">Not yet</span>';
+}
+function peopleSelect(key,id){
+  var cur=data[key];
+  return '<label for="'+id+'">Viewing as (demo only)</label><select id="'+id+'" data-me="'+key+'">'+
+    data.people.map(function(p){ return '<option value="'+p.id+'"'+(p.id===cur?' selected':'')+'>'+esc(p.name)+' (age '+ageYears(p,now())+')</option>'; }).join('')+'</select>';
+}
+
+function skillRows(p,lv,mode){
+  var h='';
+  for(var i=0;i<4;i++){
+    var name=LEVELS[lv-1].skills[i], st=skillState(p,lv,i);
+    h+='<div class="skill"><div class="skrow"><span class="skname">'+esc(name)+'</span>'+(mode==='admin'?'':stateChip(st))+'</div>';
+    if(mode==='admin'){
+      h+='<div class="seg" role="group" aria-label="Status of '+esc(name)+'">'+
+        [['none','Not yet'],['learning','Learning'],['done','Done']].map(function(o){
+          return '<button type="button" class="segbtn s-'+o[0]+'" aria-pressed="'+(st===o[0])+'" data-act="skill" data-id="'+p.id+'" data-lv="'+lv+'" data-i="'+i+'" data-val="'+o[0]+'">'+o[1]+'</button>';
+        }).join('')+'</div>';
+    }
+    h+='</div>';
+  }
+  return h;
+}
+
+function levelSection(p,mode,n){
+  var pr=progress(p), L=p.level, h='<section class="card"><h3 class="sec">Level and skills</h3>';
+  h+='<div class="chips" style="margin:0 0 4px">'+levelChip(L)+(p.completed[6]?'<span class="chip ok">✓ All levels completed</span>':'<span class="meta">working on this level</span>')+'</div>';
+  h+='<div class="meta">'+pr+' of 4 skills done at Level '+L+'</div>'+bar(pr,4);
+  h+='<div>'+skillRows(p,L,mode)+'</div>';
+  if(p.completed[L]){
+    h+='<p class="okline">✓ Level '+L+' completed on '+esc(fmt(parse(p.completed[L])))+'.</p>';
+  } else if(mode==='admin'){
+    if(pr===4) h+='<button type="button" class="act" data-act="complete" data-id="'+p.id+'">Mark Level '+L+' completed</button>';
+    else h+='<button type="button" class="act" disabled>Mark Level '+L+' completed</button><p class="small" style="margin:6px 0 0">Needs all 4 skills done first ('+pr+' of 4 now).</p>';
+  } else if(pr===4){
+    h+='<p class="okline">✓ All 4 skills done. Ready for the club to mark Level '+L+' complete.</p>';
+  }
+  if(L<6){
+    h+='<details class="ahead"><summary>Working ahead: Level '+(L+1)+' skills</summary>'+skillRows(p,L+1,mode)+
+       '<p class="small" style="margin:6px 0 0">Skills at the next level can be started early. They count once the person moves up.</p></details>';
+  }
+  return h+'</section>';
+}
+
+function certSection(p,mode,n){
+  var h='<section class="card"><h3 class="sec">Certifications</h3>';
+  CERTS.forEach(function(c){
+    var s=certState(p,c.id,n);
+    h+='<div class="cert"><div class="crow"><div><b>'+esc(c.name)+'</b><span class="meta">'+esc(certDetail(c,s))+'</span></div>'+certChip(s)+'</div>';
+    if(mode==='admin'){
+      var a=function(val,label,cls){ return '<button type="button" class="act '+(cls||'')+'" data-act="cert" data-id="'+p.id+'" data-cert="'+c.id+'" data-val="'+val+'">'+label+'</button>'; };
+      if(s.state==='none') h+='<div class="pair">'+a('learning','Start learning','alt')+a('done','Mark achieved today')+'</div>';
+      else if(s.state==='learning') h+='<div class="pair">'+a('done','Mark achieved today')+a('clear','Stop learning','alt')+'</div>';
+      else if(s.state!=='blocked') h+='<div class="pair">'+(c.years?a('done','Renew today','alt'):'<span></span>')+a('clear','Remove record','danger')+'</div>';
+    }
+    h+='</div>';
+  });
+  h+='<p class="small" style="margin:8px 0 0">Sample rules: safeguarding and vetting reviewed every 3 years, first aid every 2 years. Stores dates only, never ID documents or vetting disclosures.</p></section>';
+  return h;
+}
+
+function coachSection(p,mode,n){
+  var age=ageYears(p,n), have=tierOf(p), h='<section class="card next"><h3 class="sec">Coaching path</h3>';
+  if(age<14){
+    h+='<p style="margin:0">Opens at age 14 (about '+plural(monthsUntilAge(p,n,14),'month')+'). Until then the focus is on gymnastics skills.</p>';
+    return h+'</section>';
+  }
+  h+='<p class="meta" style="margin:0 0 6px">Coach tier: <b>'+(have?esc(CERT['t'+have].name):'none yet')+'</b></p>';
+  var can=GROUPS.filter(function(g){ return assistEval(p,g,n).meets; });
+  h+='<p style="margin:0 0 6px"><b>Can assist:</b> '+(can.length?can.map(function(g){return esc(g.name);}).join(', '):'no group yet')+'</p>';
+  if(p.assists){
+    var ag=G(p.assists), r=assistEval(p,ag,n);
+    h+='<p class="line '+(r.meets?'ok':'bad')+'" style="margin:0 0 6px">'+(r.meets?'✓':'⚠')+' Currently assisting '+esc(ag.name)+(r.meets?'':': requirements not met ('+esc(r.blockers[0].text)+')')+'</p>';
+  }
+  var nx=nextAssist(p,n);
+  if(!nx) h+='<p class="okline">✓ Meets the requirements to assist all '+GROUPS.length+' sample groups.</p>';
+  else h+='<p style="margin:8px 0 4px">Next step towards <b>'+esc(nx.group.name)+'</b>:</p><ol class="steps">'+nx.res.blockers.map(function(b){return '<li>'+esc(b.first)+'</li>';}).join('')+'</ol>';
+  if(mode==='admin'){
+    h+='<label for="assistSel">Assisting group</label><select id="assistSel" data-set-assist="'+p.id+'"><option value="">None</option>'+
+      GROUPS.map(function(g){
+        var ok=assistEval(p,g,n).meets, sel=p.assists===g.id;
+        return '<option value="'+g.id+'"'+(sel?' selected':'')+((!ok&&!sel)?' disabled':'')+'>'+esc(g.name)+(ok?'':' (requirements not met)')+'</option>';
+      }).join('')+'</select>';
+  }
+  return h+'</section>';
+}
+
+function groupSection(p,mode,n){
+  var g=G(p.group), f=fit(p,g,n), h='<section class="card"><h3 class="sec">Training group</h3>';
+  if(mode==='admin'){
+    h+='<label for="groupSel" style="margin-top:0">Group</label><select id="groupSel" data-set-group="'+p.id+'">'+
+      GROUPS.map(function(x){ return '<option value="'+x.id+'"'+(x.id===p.group?' selected':'')+'>'+esc(x.name)+'</option>'; }).join('')+'</select>';
+  } else {
+    h+='<p style="margin:0"><b>'+esc(g.name)+'</b></p>';
+  }
+  h+='<div class="chips">'+fitChip(f)+'</div>'+
+     '<p class="small" style="margin:6px 0 0">Group range: '+rangeText(g.minL,g.maxL,'Level')+' · ages '+g.minA+'–'+g.maxA+'. This person: Level '+p.level+', age '+f.a+'.'+
+     (f.level==='above'?' Above the range, so possibly ready to move up.':f.level==='below'?' Below the range, so this group may be a stretch.':'')+'</p></section>';
+  return h;
+}
+
+function historySection(p){
+  var items=[];
+  Object.keys(p.completed).forEach(function(k){ items.push({d:p.completed[k], t:'Level '+k+' completed ('+LEVELS[k-1].short+')'}); });
+  CERTS.forEach(function(c){ var r=p.certs[c.id]; if(r && r.status==='done') items.push({d:r.date, t:c.name+' '+(c.years?'recorded':'achieved')}); });
+  items.sort(function(a,b){ return a.d<b.d?1:-1; });
+  var h='<section class="card"><h3 class="sec">Achievements so far</h3>';
+  if(!items.length) return h+'<p class="meta" style="margin:0">Nothing recorded yet.</p></section>';
+  return h+'<ul class="tl">'+items.map(function(i){ return '<li><span>'+esc(i.t)+'</span><span class="meta">'+esc(fmt(parse(i.d)))+'</span></li>'; }).join('')+'</ul></section>';
+}
+
+function learningCard(p){
+  var l=learningList(p);
+  if(!l.length) return '';
+  return '<section class="card"><h3 class="sec">Learning now</h3><div class="chips" style="margin:0">'+l.map(function(x){ return '<span class="chip wrap info">'+esc(x)+'</span>'; }).join('')+'</div></section>';
+}
+
+function reqLabel(r,p){ return r.kind==='level' ? 'Move up a level' : 'Start: '+CERT[r.target].name; }
+
+function adminRequests(p,n){
+  var list=pending(p);
+  if(!list.length) return '';
+  var h='<section class="card alert"><h3 class="sec">Requests from '+esc(p.name)+'</h3>';
+  list.forEach(function(r){
+    var ok, why='';
+    if(r.kind==='level'){ ok=ready(p); if(!ok) why='Not ready: '+progress(p)+' of 4 skills done at Level '+p.level+'.'; else why='All 4 skills done. Approving marks Level '+p.level+' completed.'; }
+    else { var s=certState(p,r.target,n); ok=(s.state==='none'); why=ok?'Approving sets this to “Learning”.':'Can’t start yet: '+(s.state==='blocked'?s.reason:'already '+s.state)+'.'; }
+    h+='<div class="cert"><div class="crow"><div><b>'+esc(reqLabel(r,p))+'</b><span class="meta">Requested '+esc(fmt(parse(r.created)))+'</span></div><span class="chip info">Pending</span></div>'+
+       '<p class="small" style="margin:6px 0 0">'+esc(why)+'</p>'+
+       '<div class="pair"><button type="button" class="act"'+(ok?'':' disabled')+' data-act="req-approve" data-rid="'+r.id+'">Approve</button>'+
+       '<button type="button" class="act danger" data-act="req-decline" data-rid="'+r.id+'">Decline</button></div></div>';
+  });
+  return h+'</section>';
+}
+
+function memberRequests(p,n){
+  var opts=[];
+  var pend=pending(p);
+  function has(kind,target){ return pend.some(function(r){ return r.kind===kind && r.target===target; }); }
+  if(!p.completed[6]){
+    var lab = p.level<6 ? 'Move up to Level '+(p.level+1)+' ('+LEVELS[p.level].short+')' : 'Complete Level 6';
+    opts.push({v:'level|level', t:lab, dis:has('level','level')});
+  }
+  CERTS.forEach(function(c){ var s=certState(p,c.id,n); if(s.state==='none') opts.push({v:'cert|'+c.id, t:'Start: '+c.name, dis:has('cert',c.id)}); });
+  var h='<section class="card"><h3 class="sec">Ask the club</h3>';
+  if(!opts.length) h+='<p class="meta" style="margin:0">Nothing to request right now.</p>';
+  else {
+    h+='<label for="reqSel" style="margin-top:0">I would like to work on</label><select id="reqSel">'+
+      opts.map(function(o){ return '<option value="'+o.v+'"'+(o.dis?' disabled':'')+'>'+esc(o.t)+(o.dis?' (already requested)':'')+'</option>'; }).join('')+'</select>'+
+      '<button type="button" class="act" data-act="req-send" data-id="'+p.id+'">Send request to admin</button>'+
+      '<p class="small" style="margin:8px 0 0">Demo only: the request appears in the Admin view in this browser. Nothing is emailed or sent anywhere.</p>';
+  }
+  var mine=data.requests.filter(function(r){ return r.pid===p.id; }).slice().reverse();
+  if(mine.length){
+    h+='<h3 class="sec" style="margin-top:14px">My requests</h3><ul class="tl">'+mine.map(function(r){
+      var chip = r.status==='pending'?'<span class="chip info">Pending</span>':r.status==='approved'?'<span class="chip ok">✓ Approved</span>':'<span class="chip none">Declined</span>';
+      return '<li><span>'+esc(reqLabel(r,p))+'<br><span class="meta">'+esc(fmt(parse(r.created)))+'</span></span>'+chip+'</li>';
+    }).join('')+'</ul>';
+  }
+  return h+'</section>';
+}
+
+function personDetail(p,mode,n){
+  var h='';
+  if(mode==='admin'){
+    h+=adminRequests(p,n)+learningCard(p)+levelSection(p,mode,n)+certSection(p,mode,n)+coachSection(p,mode,n)+groupSection(p,mode,n)+historySection(p);
+  } else {
+    h+=learningCard(p)+levelSection(p,mode,n)+memberRequests(p,n)+certSection(p,mode,n)+coachSection(p,mode,n)+groupSection(p,mode,n)+historySection(p);
+  }
+  return h;
+}
+
+/* =====================================================================
+   VIEWS
+   ===================================================================== */
+var ui={filter:'all', group:'all'};
+
+function viewAdmin(){
+  var n=now(), all=data.people.slice(), counts={all:all.length, ready:0, alerts:0, req:0};
+  all.forEach(function(p){ if(ready(p)) counts.ready++; if(alerts(p,n).length) counts.alerts++; if(pending(p).length) counts.req++; });
+  var list=all.filter(function(p){
+    if(ui.group!=='all' && p.group!==ui.group) return false;
+    if(ui.filter==='ready') return ready(p);
+    if(ui.filter==='alerts') return alerts(p,n).length>0;
+    if(ui.filter==='req') return pending(p).length>0;
+    return true;
+  });
+  list.sort(function(a,b){
+    var ga=GROUPS.indexOf(G(a.group)), gb=GROUPS.indexOf(G(b.group));
+    return ga-gb || b.level-a.level || a.name.localeCompare(b.name);
+  });
+  function fb(key,label,c){ return '<button type="button" class="fbtn" data-filter="'+key+'" aria-pressed="'+(ui.filter===key)+'">'+label+' ('+c+')</button>'; }
+  var h='<h2>Admin view</h2><p class="sub">Everyone in the club. Tap a person to open their record and edit it.</p>'+
+    '<div class="filters">'+fb('all','Everyone',counts.all)+fb('ready','Ready to level up',counts.ready)+fb('alerts','Date alerts',counts.alerts)+fb('req','Requests',counts.req)+'</div>'+
+    '<label for="fgroup" style="margin-top:0">Group</label><select id="fgroup" data-fgroup="1" style="margin-bottom:12px"><option value="all">All groups</option>'+
+    GROUPS.map(function(g){ return '<option value="'+g.id+'"'+(ui.group===g.id?' selected':'')+'>'+esc(g.name)+'</option>'; }).join('')+'</select>';
+  if(!list.length) h+='<p class="sub">Nobody matches this filter.</p>';
+  list.forEach(function(p){
+    var pr=progress(p), al=alerts(p,n), rq=pending(p).length, ln=learningList(p).length;
+    h+='<a class="rowbtn" href="#admin/'+p.id+'" data-open="'+p.id+'"><div class="rowtop"><div><div class="name">'+esc(p.name)+'</div>'+
+      '<div class="meta">Age '+ageYears(p,n)+' · '+esc(G(p.group).name)+'</div></div>'+levelChip(p.level)+'</div>'+
+      '<div class="meta" style="margin-top:6px">Skills at this level: '+pr+' of 4</div>'+bar(pr,4)+
+      '<div class="chips">'+
+        (ready(p)?'<span class="chip ok">✓ Ready to level up</span>':'')+
+        (rq?'<span class="chip info">'+plural(rq,'request')+'</span>':'')+
+        al.map(function(a){ return '<span class="chip wrap '+a.sev+'">'+(a.sev==='bad'?'✕ ':'⚠ ')+esc(a.text)+'</span>'; }).join('')+
+        (ln?'<span class="chip none">Learning '+ln+'</span>':'')+
+      '</div></a>';
+  });
+  return h;
+}
+
+function viewMember(){
+  var p=getP(data.meMember), n=now();
+  var head='<section class="card"><div class="rowtop"><div><div class="name" style="font-size:1.25rem">'+esc(p.name)+'</div><div class="meta">Age '+ageYears(p,n)+' · '+esc(G(p.group).name)+'</div></div>'+levelChip(p.level)+'</div></section>';
+  return '<h2>Member view</h2><p class="sub">My own status, and what I would like to work on next.</p>'+peopleSelect('meMember','meSel')+'<div style="height:12px"></div>'+head+personDetail(p,'member',n);
+}
+
+function viewAttendee(){
+  var p=getP(data.meAttendee), n=now(), g=G(p.group), f=fit(p,g,n);
+  var mates=data.people.filter(function(x){ return x.group===g.id; }).sort(function(a,b){ return b.level-a.level || a.name.localeCompare(b.name); });
+  var lv=mates.map(function(x){return x.level;}), lo=Math.min.apply(null,lv), hi=Math.max.apply(null,lv);
+  var helpers=data.people.filter(function(x){ return x.assists===g.id; });
+  var others=GROUPS.filter(function(x){ if(x.id===g.id) return false; var ff=fit(p,x,n); return ff.level==='within' && ff.age==='within'; });
+  var lvTxt=levelLabel(p.level);
+  var levelSentence = f.level==='within' ? 'Your level ('+lvTxt+') is inside this group’s range ('+rangeText(g.minL,g.maxL,'Level')+').'
+    : f.level==='above' ? 'Your level ('+lvTxt+') is above this group’s range ('+rangeText(g.minL,g.maxL,'Level')+'). You may be ready for a more advanced group.'
+    : 'Your level ('+lvTxt+') is below this group’s range ('+rangeText(g.minL,g.maxL,'Level')+'). This group may be a stretch for now.';
+  var ageSentence = f.age==='within' ? 'Your age ('+f.a+') is inside the group’s age range ('+g.minA+'–'+g.maxA+').'
+    : 'Your age ('+f.a+') is outside the group’s age range ('+g.minA+'–'+g.maxA+').';
+  var h='<h2>Attendee view</h2><p class="sub">The group I attend, who is in it, and whether it is the right level for me.</p>'+peopleSelect('meAttendee','attSel')+'<div style="height:12px"></div>';
+  h+='<section class="card"><h3 class="sec">My group</h3><div class="name" style="font-size:1.25rem">'+esc(g.name)+'</div>'+
+     '<div class="meta">'+rangeText(g.minL,g.maxL,'Level')+' · ages '+g.minA+'–'+g.maxA+' (sample)</div>'+
+     '<div class="meta" style="margin-top:6px">'+plural(mates.length,'person')+' in this group today, working at '+(lo===hi?'Level '+lo:'Levels '+lo+'–'+hi)+'.</div></section>';
+  h+='<section class="card"><h3 class="sec">Is this the right level for me?</h3><div class="chips" style="margin:0 0 8px">'+fitChip(f)+levelChip(p.level)+'</div>'+
+     '<p style="margin:0 0 6px">'+esc(levelSentence)+'</p><p style="margin:0">'+esc(ageSentence)+'</p>';
+  h+=others.length ? '<p style="margin:10px 0 0"><b>Other groups that fit my level and age:</b> '+others.map(function(x){return esc(x.name);}).join(', ')+'.</p>'
+                   : '<p class="meta" style="margin:10px 0 0">No other sample group fits both my level and my age.</p>';
+  h+='</section>';
+  h+='<section class="card"><h3 class="sec">Who is in my group</h3>'+mates.map(function(x){
+      var d=x.level-p.level, cmp = x.id===p.id ? '<span class="chip info">You</span>' : d===0 ? '<span class="chip none">Same level</span>' : '<span class="chip none">'+(d>0?'+':'−')+plural(Math.abs(d),'level')+'</span>';
+      return '<div class="mate"><div><b>'+esc(x.name)+'</b><div class="meta">Age '+ageYears(x,n)+'</div></div><div class="chips" style="margin:0;justify-content:flex-end">'+levelChip(x.level)+cmp+'</div></div>';
+    }).join('')+'<p class="small" style="margin:8px 0 0">Group-mates show first name, age and level only (sample privacy rule).</p></section>';
+  if(helpers.length){
+    h+='<section class="card"><h3 class="sec">Assistant coaches in my group</h3>'+helpers.map(function(x){
+      var t=tierOf(x); return '<div class="mate"><div><b>'+esc(x.name)+'</b></div><span class="chip none">'+(t?esc(CERT['t'+t].name):'No tier')+'</span></div>';
+    }).join('')+'</section>';
+  }
+  h+='<section class="card"><h3 class="sec">Have a question?</h3><p class="meta" style="margin:0">Ask the club about this group or whether it is the right level for me.</p>'+
+     '<button type="button" class="act" data-act="query">Submit a query to the club</button>'+
+     '<div class="card info" id="queryMsg" role="status" tabindex="-1" hidden style="margin:10px 0 0"><b>No information has been sent.</b><br>In the live version, this button would email the club admin to request information. This demo does not send anything.</div></section>';
+  return h;
+}
+
+function viewTools(){
+  var n=now();
+  return '<h2>Demo tools</h2><p class="sub">For trying the demo. A real club would not need the date buttons.</p>'+
+    '<div class="card"><b>Move the demo date forward</b><p class="small" style="margin:4px 0 8px">Watch certificates turn amber, then red, with nothing typed in.</p>'+
+      '<div class="btnrow"><button type="button" class="act alt" data-act="clock" data-n="7">+7 days</button><button type="button" class="act alt" data-act="clock" data-n="30">+30 days</button><button type="button" class="act alt" data-act="clock" data-n="90">+90 days</button></div>'+
+      '<button type="button" class="act danger" data-act="clock" data-n="0">Back to today</button>'+
+      '<p class="small" style="margin:8px 0 0">Demo date: <b>'+esc(fmt(n))+'</b> ('+(data.offset>=0?'+':'')+data.offset+' days)</p></div>'+
+    '<div class="card"><b>Reset</b><p class="small" style="margin:4px 0 0">Restores the original 12 sample people and clears every change.</p>'+
+      '<button type="button" class="act danger" data-act="reset">Reset sample data</button></div>'+
+    '<div class="card"><b>Sample club rules</b><details class="ahead" style="border-top:0;margin-top:0"><summary>Levels, groups and certificate rules</summary>'+
+      '<p class="small"><b>Levels (4 skills each):</b> '+LEVELS.map(function(l){ return l.n+' '+esc(l.short); }).join(' · ')+'</p>'+
+      '<p class="small"><b>Groups:</b></p><ul class="small">'+GROUPS.map(function(g){ return '<li>'+esc(g.name)+': '+rangeText(g.minL,g.maxL,'Level').toLowerCase()+', ages '+g.minA+'–'+g.maxA+'. Assisting needs '+esc(CERT['t'+g.assist].name)+' plus valid safeguarding and vetting status.</li>'; }).join('')+'</ul>'+
+      '<p class="small">Level completion needs all 4 skills done. Certificate ages: coaching starts at 14, Club tier at 16, Advanced tier at 18.</p></details></div>'+
+    '<div class="card"><b>About this demo</b><p class="small" style="margin:6px 0 0">Fictional concept for a coursework project. All 12 people are invented; the first names are among the most popular newborn names in Ireland in 2025 (CSO), and ages, levels and certificates are made up. Data is saved only in this browser (localStorage) and nothing is sent anywhere. Levels, skills, tiers and intervals are samples, not Gymnastics Ireland policy. This tool tracks dates and progress only; it does not decide who is allowed to work with children.</p></div>';
+}
+
+/* =====================================================================
+   RENDERING, ROUTING, SHEET
+   ===================================================================== */
+var app=document.getElementById('app'), nav=document.getElementById('nav');
+var sheet=document.getElementById('sheet'), overlay=document.getElementById('overlay'), sheetBody=document.getElementById('sheetBody');
+var cur={view:null}, openPid=null, lastFocusPid=null, cameFromList=false;
+
+function renderMain(view){
+  var f={member:viewMember, attendee:viewAttendee, admin:viewAdmin, tools:viewTools}[view];
+  app.innerHTML=f();
+  Array.prototype.forEach.call(nav.querySelectorAll('a'), function(a){
+    if(a.getAttribute('data-tab')===view) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');
+  });
+  document.getElementById('sampleBar').textContent = 'SAMPLE DATA: invented people, no real club or children.'+(data.offset?' Demo date moved +'+data.offset+' days.':'');
+}
+function renderSheet(pid){
+  var p=getP(pid), n=now();
+  document.getElementById('sheetTitle').textContent=p.name;
+  document.getElementById('sheetSub').innerHTML='<div class="chips" style="margin:4px 0 0"><span class="chip warn">SAMPLE RECORD</span><span class="meta">Age '+ageYears(p,n)+' · '+esc(G(p.group).name)+'</span>'+levelChip(p.level)+'</div>';
+  var st=(openPid===pid)?sheetBody.scrollTop:0;
+  sheetBody.innerHTML=personDetail(p,'admin',n);
+  sheetBody.scrollTop=st;
+}
+function openSheet(pid){
+  if(!getP(pid)){ location.hash='#admin'; return; }
+  var first=(openPid===null);
+  renderSheet(pid);
+  openPid=pid; lastFocusPid=pid;
+  sheet.hidden=false; overlay.hidden=false;
+  document.body.classList.add('lock'); app.inert=true; nav.inert=true;
+  if(first){ sheetBody.scrollTop=0; document.getElementById('sheetClose').focus({preventScroll:true}); }
+}
+function closeSheet(){
+  if(openPid===null) return;
+  openPid=null; sheet.hidden=true; overlay.hidden=true; sheetBody.innerHTML='';
+  document.body.classList.remove('lock'); app.inert=false; nav.inert=false;
+  var el=app.querySelector('[data-open="'+lastFocusPid+'"]'); if(el) el.focus({preventScroll:true});
+}
+function parseHash(){ var h=(location.hash||'#admin').slice(1).split('/'); return {view:h[0]||'admin', arg:h[1]||null}; }
+function route(){
+  var r=parseHash();
+  var view=['member','attendee','admin','tools'].indexOf(r.view)>-1 ? r.view : 'admin';
+  if(view!==cur.view){ renderMain(view); window.scrollTo(0,0); }
+  cur.view=view;
+  if(view==='admin' && r.arg) openSheet(r.arg); else closeSheet();
+}
+function selOf(el){
+  if(!el || el===document.body) return null;
+  if(el.id) return '#'+el.id;
+  var s=el.tagName.toLowerCase();
+  for(var k in el.dataset){ s+='[data-'+k.replace(/[A-Z]/g,function(c){return '-'+c.toLowerCase();})+'="'+el.dataset[k]+'"]'; }
+  return s==='button'||s==='select'||s==='a' ? null : s;
+}
+function refresh(){
+  var y=window.scrollY, active=document.activeElement, sel=selOf(active), inSheet=sheet.contains(active);
+  renderMain(cur.view);
+  if(openPid!==null) renderSheet(openPid);
+  window.scrollTo(0,y);
+  if(sel){ var el=(inSheet?sheet:app).querySelector(sel); if(el && !el.disabled) el.focus({preventScroll:true}); }
+}
+
+/* ---------- undo toast ---------- */
+var undoSnap=null, toastTimer=null;
+function toast(msg,snap){
+  undoSnap=snap;
+  document.getElementById('toastMsg').textContent=msg;
+  document.getElementById('toastUndo').hidden=!snap;
+  document.getElementById('toast').hidden=false;
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){ document.getElementById('toast').hidden=true; undoSnap=null; },8000);
+}
+document.getElementById('toastUndo').addEventListener('click',function(){
+  if(undoSnap){ data=JSON.parse(undoSnap); save(); undoSnap=null; }
+  document.getElementById('toast').hidden=true;
+  refresh();
+});
+
+/* ---------- events ---------- */
+function closeFromUi(){
+  if(cameFromList){ cameFromList=false; history.back(); } else { location.hash='#admin'; }
+}
+document.getElementById('sheetClose').addEventListener('click', closeFromUi);
+overlay.addEventListener('click', closeFromUi);
+document.addEventListener('keydown',function(e){
+  if(openPid===null) return;
+  if(e.key==='Escape'){ e.preventDefault(); closeFromUi(); return; }
+  if(e.key==='Tab'){   // keep focus inside the pop-out
+    var f=sheet.querySelectorAll('button:not([disabled]),select,summary,a[href]');
+    if(!f.length) return;
+    var first=f[0], last=f[f.length-1];
+    if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+  }
+});
+
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-act],[data-open],[data-filter]');
+  if(!t) return;
+  if(t.hasAttribute('data-open')){ cameFromList=true; return; }     // normal link; the hash change opens the pop-out
+  if(t.hasAttribute('data-filter')){ ui.filter=t.getAttribute('data-filter'); refresh(); return; }
+  var act=t.getAttribute('data-act'), n=now(), snap=JSON.stringify(data);
+  var p=getP(t.getAttribute('data-id')), msg=null;
+
+  if(act==='skill' && p){
+    var lv=+t.getAttribute('data-lv'), i=+t.getAttribute('data-i'), val=t.getAttribute('data-val');
+    if(lv!==p.level && lv!==p.level+1) return;
+    var key=skillKey(lv,i);
+    if(val==='none') delete p.skills[key]; else p.skills[key]=val;
+    msg=p.name+': '+LEVELS[lv-1].skills[i]+' → '+(val==='none'?'not yet':val)+'.';
+  }
+  else if(act==='complete' && p){
+    if(!ready(p)) return;
+    var done=p.level; completeLevel(p,n);
+    msg=p.name+': Level '+done+' completed'+(done<6?'. Now working on Level '+p.level+'.':'.');
+  }
+  else if(act==='cert' && p){
+    var id=t.getAttribute('data-cert'), v=t.getAttribute('data-val'), s=certState(p,id,n);
+    if(v==='clear'){
+      delete p.certs[id];
+      if(CERT[id].tier){ for(var j=CERT[id].tier+1;j<=3;j++) delete p.certs['t'+j]; }
+      msg=p.name+': '+CERT[id].name+' removed.';
+    } else {
+      if(s.state==='blocked') return;
+      p.certs[id]={status:v, date:v==='done'?iso(n):null};
+      resolvePending(p.id,'cert',id);
+      msg=p.name+': '+CERT[id].name+(v==='done'?' recorded as achieved today.':' marked as learning.');
+    }
+  }
+  else if(act==='req-approve' || act==='req-decline'){
+    var r=null; data.requests.forEach(function(x){ if(x.id===t.getAttribute('data-rid')) r=x; });
+    if(!r || r.status!=='pending') return;
+    var rp=getP(r.pid);
+    if(act==='req-approve'){
+      if(r.kind==='level'){ if(!ready(rp)) return; completeLevel(rp,n); }
+      else { if(certState(rp,r.target,n).state!=='none') return; rp.certs[r.target]={status:'learning',date:null}; }
+      r.status='approved'; r.decided=iso(n); msg='Approved for '+rp.name+'.';
+    } else { r.status='declined'; r.decided=iso(n); msg='Declined for '+rp.name+'.'; }
+  }
+  else if(act==='req-send' && p){
+    var sel=document.getElementById('reqSel'); if(!sel||!sel.value) return;
+    var parts=sel.value.split('|');
+    data.requests.push({id:'r'+(data.nextReq++), pid:p.id, kind:parts[0], target:parts[1], created:iso(n), status:'pending'});
+    msg='Request saved for the admin view (demo: nothing was emailed).';
+  }
+  else if(act==='query'){
+    var box=document.getElementById('queryMsg'); box.hidden=false; box.focus({preventScroll:false});
+    return;     // deliberately sends and stores nothing
+  }
+  else if(act==='clock'){ var k=parseInt(t.getAttribute('data-n'),10); data.offset = k===0 ? 0 : data.offset+k; msg='Demo date moved.'; }
+  else if(act==='reset'){ data=seed(); save(); toast('Sample data reset.',null); refresh(); return; }
+  else return;
+
+  save(); toast(msg,snap); refresh();
+});
+
+document.addEventListener('change',function(e){
+  var el=e.target, snap=JSON.stringify(data), n=now();
+  if(el.hasAttribute('data-me')){ data[el.getAttribute('data-me')]=el.value; save(); refresh(); return; }
+  if(el.hasAttribute('data-fgroup')){ ui.group=el.value; refresh(); return; }
+  if(el.hasAttribute('data-set-group')){
+    var p=getP(el.getAttribute('data-set-group')); p.group=el.value; save(); toast(p.name+' moved to '+G(el.value).name+'.',snap); refresh(); return;
+  }
+  if(el.hasAttribute('data-set-assist')){
+    var q=getP(el.getAttribute('data-set-assist')), v=el.value||null;
+    if(v && !assistEval(q,G(v),n).meets){ refresh(); return; }
+    q.assists=v; save(); toast(v?q.name+' now assists '+G(v).name+'.':q.name+' no longer assists a group.',snap); refresh(); return;
+  }
+});
+window.addEventListener('hashchange',route);
+
+/* ---------- start ---------- */
+data=load();
+// Hash links: set location.hash directly so they also work inside a sandboxed srcdoc preview.
+document.addEventListener('click',function(e){ var a=e.target.closest('a[href^="#"]'); if(a){ e.preventDefault(); location.hash=a.getAttribute('href'); } });
+// The preview is hosted in an opaque-origin srcdoc; route() defaults to Admin without changing history.
+route();
+})();
+</script>
+</body>
+</html>
